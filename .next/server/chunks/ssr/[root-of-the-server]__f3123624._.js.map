@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 23, "column": 0}, "map": {"version":3,"sources":["file:///home/nkruger/github/mpquarter/src/compoments/noSsr.tsx"],"sourcesContent":["'use client'\nimport { useEffect, useState } from \"react\"\n\nexport function NoSsr({ children }: { children: React.ReactNode }) {\r\n  const [mounted, setMounted] = useState(false)\r\n\r\n  useEffect(() => {\r\n    setMounted(true)\r\n  }, [])\r\n\r\n  return mounted ? <>{children}</> : null\r\n}\n\n"],"names":[],"mappings":";;;;AACA;AADA;;;AAGO,SAAS,MAAM,EAAE,QAAQ,EAAiC;IAC/D,MAAM,CAAC,SAAS,WAAW,GAAG,CAAA,GAAA,mGAAA,CAAA,WAAQ,AAAD,EAAE;IAEvC,CAAA,GAAA,mGAAA,CAAA,YAAS,AAAD,EAAE;QACR,WAAW;IACb,GAAG,EAAE;IAEL,OAAO,wBAAU;kBAAG;wBAAe;AACrC","debugId":null}},
+    {"offset": {"line": 46, "column": 0}, "map": {"version":3,"sources":["file:///home/nkruger/github/mpquarter/src/pages/_app.tsx"],"sourcesContent":["import { NoSsr } from \"@/compoments/noSsr\";\nimport \"@/styles/globals.css\";\nimport type { AppProps } from \"next/app\";\n\n\n\nexport default function App({ Component, pageProps }: AppProps) {\n  return <NoSsr><Component {...pageProps} /></NoSsr>;\n}\n"],"names":[],"mappings":";;;;AAAA;;;;AAMe,SAAS,IAAI,EAAE,SAAS,EAAE,SAAS,EAAY;IAC5D,qBAAO,qKAAC,oHAAA,CAAA,QAAK;kBAAC,cAAA,qKAAC;YAAW,GAAG,SAAS;;;;;;;;;;;AACxC","debugId":null}}]
+}
