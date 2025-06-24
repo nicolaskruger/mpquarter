@@ -1,53 +1,67 @@
 import { useRef, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import { FFmpeg } from '@ffmpeg/ffmpeg'
-import { toBlobURL } from '@ffmpeg/util'
+import { fetchFile, toBlobURL } from '@ffmpeg/util'
 
 function App() {
-  const [count, setCount] = useState(0)
   const ffmpegRef = useRef(new FFmpeg())
+
+  const [outUrl, setOutUrl] = useState("");
+
   const load = async () => {
     const baseURL = "https://unpkg.com/@ffmpeg/core-mt@0.12.10/dist/esm";
     const ffmpeg = ffmpegRef.current;
-    await ffmpeg.load({
-      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
-      wasmURL: await toBlobURL(
-        `${baseURL}/ffmpeg-core.wasm`,
-        "application/wasm"
-      ),
-      workerURL: await toBlobURL(
-        `${baseURL}/ffmpeg-core.worker.js`,
-        "text/javascript"
-      ),
+    ffmpeg.on("log", ({ message }) => {
+      console.log(message)
     });
+
+    try {
+      await ffmpeg.load({
+        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
+        wasmURL: await toBlobURL(
+          `${baseURL}/ffmpeg-core.wasm`,
+          "application/wasm"
+        ),
+        workerURL: await toBlobURL(
+          `${baseURL}/ffmpeg-core.worker.js`,
+          "text/javascript"
+        ),
+      });
+
+      debugger;
+    }
+    catch (e) {
+      console.log(e)
+      debugger
+    }
   }
-  const transcode = async () => {
+
+  const transcode = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    let count = 0;
+    console.log(++count)
     await load();
+    console.log(++count)
+    setOutUrl("");
+    const file = e.target?.files?.[0];
+    console.log(++count, file)
+    if (!file) return;
+    console.log(++count)
+    const ffmpeg = ffmpegRef.current;
+    await ffmpeg.writeFile(file.name, await fetchFile(file));
+    await ffmpeg.exec(["-i", file.name, '-vcodec', 'libx264', '-crf', '28', "-preset", "fast", "-acodec", "aac", "-b:a", "128k", "output.mp4"]);
+    const fileData = await ffmpeg.readFile("output.mp4");
+    const data = new Uint8Array(fileData as ArrayBuffer);
+    const url = URL.createObjectURL(
+      new Blob([data.buffer], { type: "video/mp4" })
+    );
+    console.log(++count, url)
+    setOutUrl(url)
   }
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <input type='file' onChange={e => transcode(e)} />
+      {outUrl && <a href={outUrl} download="compressed.mp4">Baixar</a>
+      }
     </>
   )
 }
