@@ -6,6 +6,7 @@ import { fetchFile, toBlobURL } from '@ffmpeg/util'
 function App() {
   const ffmpegRef = useRef(new FFmpeg())
 
+  const [loaded, setLoaded] = useState(false);
   const [outUrl, setOutUrl] = useState("");
 
   const load = async () => {
@@ -28,6 +29,7 @@ function App() {
         ),
       });
 
+      setLoaded(true)
       debugger;
     }
     catch (e) {
@@ -59,6 +61,8 @@ function App() {
   }
   return (
     <>
+      <button onClick={() => load()}>load</button>
+      {loaded && <p>loaded ...</p>}
       <input type='file' onChange={e => transcode(e)} />
       {outUrl && <a href={outUrl} download="compressed.mp4">Baixar</a>
       }
